@@ -47,12 +47,24 @@
         </button>
     </div>
 
+    <!-- Custom Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Delete Timer?</h3>
+            <p>Are you sure you want to remove this timer? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="cancel-delete" class="btn-secondary">Cancel</button>
+                <button id="confirm-delete" class="btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Templates for Dynamic Elements -->
     <template id="stopwatch-template">
         <div class="card stopwatch-card">
             <div class="card-header">
                 <input type="text" class="card-title" value="Stopwatch" placeholder="Rename...">
-                <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                <button class="delete-btn" title="Delete"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="time-display">00:00:00<span class="milliseconds">.00</span></div>
             <div class="controls">
@@ -67,13 +79,28 @@
         <div class="card timer-card">
             <div class="card-header">
                 <input type="text" class="card-title" value="Timer" placeholder="Rename...">
-                <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                <button class="delete-btn" title="Delete"><i class="fa-solid fa-trash"></i></button>
             </div>
-            <div class="timer-input-container">
-                <input type="number" class="timer-input days" placeholder="0d" min="0"> :
-                <input type="number" class="timer-input hours" placeholder="00" min="0" max="23"> :
-                <input type="number" class="timer-input minutes" placeholder="00" min="0" max="59"> :
-                <input type="number" class="timer-input seconds" placeholder="00" min="0" max="59">
+            <div class="timer-input-wrapper">
+                <div class="input-group">
+                    <input type="number" class="timer-input days" placeholder="0" min="0">
+                    <span class="label">d</span>
+                </div>
+                <span class="colon">:</span>
+                <div class="input-group">
+                    <input type="number" class="timer-input hours" placeholder="00" min="0" max="23">
+                    <span class="label">h</span>
+                </div>
+                <span class="colon">:</span>
+                <div class="input-group">
+                    <input type="number" class="timer-input minutes" placeholder="00" min="0" max="59">
+                    <span class="label">m</span>
+                </div>
+                <span class="colon">:</span>
+                <div class="input-group">
+                    <input type="number" class="timer-input seconds" placeholder="00" min="0" max="59">
+                    <span class="label">s</span>
+                </div>
             </div>
             <div class="time-display hidden">00:00:00</div>
             <div class="controls">

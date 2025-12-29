@@ -56,6 +56,31 @@ const triggerSave = () => {
     }
 };
 
+// Custom Modal Logic
+const deleteModal = document.getElementById('delete-modal');
+const cancelDeleteBtn = document.getElementById('cancel-delete');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+let deleteResolver = null;
+
+const showDeleteModal = () => {
+    return new Promise((resolve) => {
+        deleteModal.classList.remove('hidden');
+        deleteResolver = resolve;
+    });
+};
+
+const hideDeleteModal = (result) => {
+    deleteModal.classList.add('hidden');
+    if (deleteResolver) {
+        deleteResolver(result);
+        deleteResolver = null;
+    }
+};
+
+cancelDeleteBtn.addEventListener('click', () => hideDeleteModal(false));
+confirmDeleteBtn.addEventListener('click', () => hideDeleteModal(true));
+
 /**
  * Base class for a Time Keeper (Counter)
  */
@@ -113,8 +138,11 @@ class TimeKeeper {
         });
     }
 
-    destroy() {
-        if (!confirm("Are you sure you want to delete this?")) return;
+    async destroy() {
+        // Use custom modal instead of native confirm
+        const confirmed = await showDeleteModal();
+        if (!confirmed) return;
+
         this.stop();
         this.element.remove();
         instances = instances.filter(i => i !== this);
@@ -229,7 +257,8 @@ class Stopwatch extends TimeKeeper {
 class Timer extends TimeKeeper {
     constructor(existingData = null) {
         super('timer', 'timer-template', existingData);
-        this.inputContainer = this.element.querySelector('.timer-input-container');
+        // Updated selector for new HTML structure
+        this.inputContainer = this.element.querySelector('.timer-input-wrapper');
         this.inputs = {
             d: this.element.querySelector('.days'),
             h: this.element.querySelector('.hours'),
@@ -323,7 +352,6 @@ class Timer extends TimeKeeper {
         this.stop();
         this.updateDisplay(0);
         this.remainingTime = 0;
-        // Simple visual alert for now
         this.display.style.color = 'var(--timer-color)';
         setTimeout(() => this.display.style.color = '', 2000);
     }
@@ -336,6 +364,8 @@ class Timer extends TimeKeeper {
         const s = totalSeconds % 60;
 
         let timeString = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        // Show days if > 0 OR if original duration had days (to prevent jumping layout)
+        // But dynamic is safer. User asked for day support.
         if (d > 0) {
             timeString = `${d}d ` + timeString;
         }
@@ -413,10 +443,6 @@ onAuthStateChanged(auth, async (user) => {
         if (docSnap.exists()) {
             const cloudData = docSnap.data().timers;
             // Strategy: Merge or Replace? 
-            // For now, if local is empty, take cloud. If local has data, maybe ask? 
-            // Simple approach: If cloud has data, load it. (Overwrites local session for now to keep it simple, or we can merge)
-            // Let's merge: Append cloud items that don't exist in local? No, that duplicates.
-            // Let's just Load Cloud for 'sync' effect.
             if (confirm("Cloud save found! Load it? (This will replace current stopwatches)")) {
                 stopwatchGrid.innerHTML = '';
                 instances = [];
