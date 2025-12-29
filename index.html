@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stopwatch & Timer</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-hourglass-half"></i> Multi-Stopwatch & Timer
+        </div>
+        <div class="user-controls">
+            <button id="auth-btn" class="btn-secondary">
+                <i class="fa-brands fa-google"></i> Sign In
+            </button>
+            <div id="user-info" class="hidden">
+                <img id="user-avatar" src="" alt="User">
+                <span id="user-name"></span>
+                <button id="logout-btn"><i class="fa-solid fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="stopwatch-grid" class="grid-container">
+            <!-- Stopwatches will be dynamically added here -->
+        </div>
+    </main>
+
+    <div class="fab-container">
+        <button id="add-stopwatch-btn" class="fab" title="Add Stopwatch">
+            <i class="fa-solid fa-plus"></i> <i class="fa-solid fa-stopwatch"></i>
+        </button>
+        <button id="add-timer-btn" class="fab secondary" title="Add Timer">
+            <i class="fa-solid fa-plus"></i> <i class="fa-solid fa-hourglass"></i>
+        </button>
+    </div>
+
+    <!-- Templates for Dynamic Elements -->
+    <template id="stopwatch-template">
+        <div class="card stopwatch-card">
+            <div class="card-header">
+                <input type="text" class="card-title" value="Stopwatch" placeholder="Rename...">
+                <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="time-display">00:00:00<span class="milliseconds">.00</span></div>
+            <div class="controls">
+                <button class="btn-control start-btn"><i class="fa-solid fa-play"></i></button>
+                <button class="btn-control pause-btn hidden"><i class="fa-solid fa-pause"></i></button>
+                <button class="btn-control reset-btn"><i class="fa-solid fa-rotate-left"></i></button>
+            </div>
+        </div>
+    </template>
+
+    <template id="timer-template">
+        <div class="card timer-card">
+            <div class="card-header">
+                <input type="text" class="card-title" value="Timer" placeholder="Rename...">
+                <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="timer-input-container">
+                <input type="number" class="timer-input hours" placeholder="00" min="0"> :
+                <input type="number" class="timer-input minutes" placeholder="00" min="0" max="59"> :
+                <input type="number" class="timer-input seconds" placeholder="00" min="0" max="59">
+            </div>
+            <div class="time-display hidden">00:00:00</div>
+            <div class="controls">
+                <button class="btn-control start-btn"><i class="fa-solid fa-play"></i></button>
+                <button class="btn-control pause-btn hidden"><i class="fa-solid fa-pause"></i></button>
+                <button class="btn-control reset-btn"><i class="fa-solid fa-rotate-left"></i></button>
+            </div>
+        </div>
+    </template>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
