@@ -114,6 +114,7 @@ class TimeKeeper {
     }
 
     destroy() {
+        if (!confirm("Are you sure you want to delete this?")) return;
         this.stop();
         this.element.remove();
         instances = instances.filter(i => i !== this);
@@ -196,11 +197,18 @@ class Stopwatch extends TimeKeeper {
 
     updateDisplay(time) {
         const date = new Date(time);
-        const m = String(date.getUTCHours() * 60 + date.getUTCMinutes()).padStart(2, '0');
+        const d = Math.floor(time / (1000 * 60 * 60 * 24));
+        const h = String(date.getUTCHours()).padStart(2, '0');
+        const m = String(date.getUTCMinutes()).padStart(2, '0');
         const s = String(date.getUTCSeconds()).padStart(2, '0');
         const ms = String(Math.floor(date.getUTCMilliseconds() / 10)).padStart(2, '0');
 
-        this.display.childNodes[0].nodeValue = `${m}:${s}`;
+        let timeString = `${h}:${m}:${s}`;
+        if (d > 0) {
+            timeString = `${d}d ` + timeString;
+        }
+
+        this.display.childNodes[0].nodeValue = timeString;
         if (this.millisecondsEl) this.millisecondsEl.textContent = `.${ms}`;
     }
 
@@ -223,6 +231,7 @@ class Timer extends TimeKeeper {
         super('timer', 'timer-template', existingData);
         this.inputContainer = this.element.querySelector('.timer-input-container');
         this.inputs = {
+            d: this.element.querySelector('.days'),
             h: this.element.querySelector('.hours'),
             m: this.element.querySelector('.minutes'),
             s: this.element.querySelector('.seconds')
@@ -252,10 +261,11 @@ class Timer extends TimeKeeper {
 
             // New Timer Start
             if (this.remainingTime === 0 && this.targetTime === 0) {
+                const d = parseInt(this.inputs.d.value) || 0;
                 const h = parseInt(this.inputs.h.value) || 0;
                 const m = parseInt(this.inputs.m.value) || 0;
                 const s = parseInt(this.inputs.s.value) || 0;
-                this.originalDuration = (h * 3600 + m * 60 + s) * 1000;
+                this.originalDuration = (d * 86400 + h * 3600 + m * 60 + s) * 1000;
                 this.remainingTime = this.originalDuration;
 
                 if (this.remainingTime <= 0) return;
@@ -290,6 +300,7 @@ class Timer extends TimeKeeper {
 
         this.inputContainer.classList.remove('hidden');
         this.display.classList.add('hidden');
+        this.inputs.d.value = '';
         this.inputs.h.value = '';
         this.inputs.m.value = '';
         this.inputs.s.value = '';
@@ -319,20 +330,34 @@ class Timer extends TimeKeeper {
 
     updateDisplay(ms) {
         const totalSeconds = Math.ceil(ms / 1000);
-        const h = Math.floor(totalSeconds / 3600);
+        const d = Math.floor(totalSeconds / 86400);
+        const h = Math.floor((totalSeconds % 86400) / 3600);
         const m = Math.floor((totalSeconds % 3600) / 60);
         const s = totalSeconds % 60;
 
-        this.display.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        let timeString = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (d > 0) {
+            timeString = `${d}d ` + timeString;
+        }
+
+        this.display.textContent = timeString;
     }
 
     toggleButtons() {
         if (this.isRunning) {
             this.startBtn.classList.add('hidden');
             this.pauseBtn.classList.remove('hidden');
+            this.inputs.d.disabled = true;
+            this.inputs.h.disabled = true;
+            this.inputs.m.disabled = true;
+            this.inputs.s.disabled = true;
         } else {
             this.startBtn.classList.remove('hidden');
             this.pauseBtn.classList.add('hidden');
+            this.inputs.d.disabled = false;
+            this.inputs.h.disabled = false;
+            this.inputs.m.disabled = false;
+            this.inputs.s.disabled = false;
         }
     }
 }

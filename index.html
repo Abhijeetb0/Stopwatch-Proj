@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
     <header>
@@ -68,7 +70,8 @@
                 <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="timer-input-container">
-                <input type="number" class="timer-input hours" placeholder="00" min="0"> :
+                <input type="number" class="timer-input days" placeholder="0d" min="0"> :
+                <input type="number" class="timer-input hours" placeholder="00" min="0" max="23"> :
                 <input type="number" class="timer-input minutes" placeholder="00" min="0" max="59"> :
                 <input type="number" class="timer-input seconds" placeholder="00" min="0" max="59">
             </div>
@@ -84,4 +87,5 @@
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="script.js"></script>
 </body>
+
 </html>
