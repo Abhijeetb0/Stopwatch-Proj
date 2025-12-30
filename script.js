@@ -276,18 +276,25 @@ class Timer extends TimeKeeper {
         this.remainingTime = existingData ? existingData.remainingTime : 0;
         this.originalDuration = existingData ? existingData.originalDuration : 0;
 
-        // If resuming or paused with progress, show display instead of inputs
+        // Restore UI State
         if (this.isRunning || this.remainingTime > 0) {
             this.inputContainer.classList.add('hidden');
             this.display.classList.remove('hidden');
-            // Check if expired while away
-            if (this.isRunning && Date.now() > this.targetTime) {
-                this.complete();
+
+            if (this.isRunning) {
+                // If running, we calculate display based on target
+                const left = this.targetTime - Date.now();
+                if (left <= 0) {
+                    this.complete();
+                } else {
+                    this.updateDisplay(left);
+                    this.start(true); // Auto-resume
+                }
             } else {
-                this.updateDisplay(this.isRunning ? (this.targetTime - Date.now()) : this.remainingTime);
+                // If paused, show remaining
+                this.updateDisplay(this.remainingTime);
+                this.toggleButtons(); // Ensure buttons show "Start" not "Pause"
             }
-            // Ensure buttons reflect state immediately
-            if (this.isRunning) this.toggleButtons();
         }
     }
 
@@ -295,7 +302,7 @@ class Timer extends TimeKeeper {
         if (!isResume) {
             if (this.isRunning) return;
 
-            // New Timer Start
+            // New Timer Start from Inputs
             if (this.remainingTime === 0 && this.targetTime === 0) {
                 const d = parseInt(this.inputs.d.value) || 0;
                 const h = parseInt(this.inputs.h.value) || 0;
@@ -309,36 +316,29 @@ class Timer extends TimeKeeper {
 
             this.isRunning = true;
             this.targetTime = Date.now() + this.remainingTime;
-
-            this.inputContainer.classList.add('hidden');
-            this.display.classList.remove('hidden');
             triggerSave();
         }
 
+        // UI Updates for Running State
+        this.inputContainer.classList.add('hidden');
+        this.display.classList.remove('hidden');
         this.element.classList.add('running-timer');
 
-        // Start interval FIRST to ensure logic runs even if UI fails
-        this.interval = setInterval(this.tick.bind(this), 100);
-
-        try {
-            this.toggleButtons();
-        } catch (e) {
-            console.error("UI Toggle Error:", e);
-        }
+        this.toggleButtons();
+        // Use requestAnimationFrame for smoother updates, matching Stopwatch logic
+        this.interval = requestAnimationFrame(this.tick.bind(this));
     }
 
     stop() {
         if (!this.isRunning) return;
         this.isRunning = false;
-        clearInterval(this.interval);
+        cancelAnimationFrame(this.interval);
+
+        // Save state
         this.remainingTime = Math.max(0, this.targetTime - Date.now());
 
         this.element.classList.remove('running-timer');
-        try {
-            this.toggleButtons();
-        } catch (e) {
-            console.error("UI Toggle Error:", e);
-        }
+        this.toggleButtons();
         triggerSave();
     }
 
@@ -358,6 +358,8 @@ class Timer extends TimeKeeper {
     }
 
     tick() {
+        if (!this.isRunning) return;
+
         const now = Date.now();
         const left = this.targetTime - now;
 
@@ -367,6 +369,7 @@ class Timer extends TimeKeeper {
         }
 
         this.updateDisplay(left);
+        this.interval = requestAnimationFrame(this.tick.bind(this));
     }
 
     complete() {
