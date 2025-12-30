@@ -309,8 +309,16 @@ class Timer extends TimeKeeper {
             triggerSave();
         }
 
-        this.toggleButtons();
+        this.element.classList.add('running-timer');
+
+        // Start interval FIRST to ensure logic runs even if UI fails
         this.interval = setInterval(this.tick.bind(this), 100);
+
+        try {
+            this.toggleButtons();
+        } catch (e) {
+            console.error("UI Toggle Error:", e);
+        }
     }
 
     stop() {
@@ -318,7 +326,13 @@ class Timer extends TimeKeeper {
         this.isRunning = false;
         clearInterval(this.interval);
         this.remainingTime = Math.max(0, this.targetTime - Date.now());
-        this.toggleButtons();
+
+        this.element.classList.remove('running-timer');
+        try {
+            this.toggleButtons();
+        } catch (e) {
+            console.error("UI Toggle Error:", e);
+        }
         triggerSave();
     }
 
@@ -375,20 +389,24 @@ class Timer extends TimeKeeper {
     }
 
     toggleButtons() {
-        if (this.isRunning) {
-            this.startBtn.classList.add('hidden');
-            this.pauseBtn.classList.remove('hidden');
-            this.inputs.d.disabled = true;
-            this.inputs.h.disabled = true;
-            this.inputs.m.disabled = true;
-            this.inputs.s.disabled = true;
-        } else {
-            this.startBtn.classList.remove('hidden');
-            this.pauseBtn.classList.add('hidden');
-            this.inputs.d.disabled = false;
-            this.inputs.h.disabled = false;
-            this.inputs.m.disabled = false;
-            this.inputs.s.disabled = false;
+        try {
+            if (this.isRunning) {
+                this.startBtn.classList.add('hidden');
+                this.pauseBtn.classList.remove('hidden');
+                if (this.inputs.d) this.inputs.d.disabled = true;
+                if (this.inputs.h) this.inputs.h.disabled = true;
+                if (this.inputs.m) this.inputs.m.disabled = true;
+                if (this.inputs.s) this.inputs.s.disabled = true;
+            } else {
+                this.startBtn.classList.remove('hidden');
+                this.pauseBtn.classList.add('hidden');
+                if (this.inputs.d) this.inputs.d.disabled = false;
+                if (this.inputs.h) this.inputs.h.disabled = false;
+                if (this.inputs.m) this.inputs.m.disabled = false;
+                if (this.inputs.s) this.inputs.s.disabled = false;
+            }
+        } catch (e) {
+            console.warn("Toggle Buttons failed", e);
         }
     }
 }
