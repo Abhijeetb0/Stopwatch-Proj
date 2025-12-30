@@ -110,12 +110,11 @@ class TimeKeeper {
         this.titleInput.value = this.title;
         this.attachEvents();
 
-        // Auto-resume if it was running
-        if (this.isRunning) {
-            this.start(true); // true = resume without new timestamp
-        } else {
-            this.updateDisplay(this.elapsedTime); // Show paused time
-        }
+        // Initialize UI
+        this.titleInput.value = this.title;
+        this.attachEvents();
+
+        // Auto-resume logic moved to subclasses to ensure 'this' is fully initialized
     }
 
     createUI(templateId) {
@@ -178,7 +177,9 @@ class Stopwatch extends TimeKeeper {
     constructor(existingData = null) {
         super('stopwatch', 'stopwatch-template', existingData);
         this.millisecondsEl = this.display.querySelector('.milliseconds');
-        if (!this.isRunning) {
+        if (this.isRunning) {
+            this.start(true);
+        } else {
             this.updateDisplay(this.elapsedTime);
         }
     }
