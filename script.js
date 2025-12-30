@@ -131,10 +131,14 @@ class TimeKeeper {
         this.pauseBtn.addEventListener('click', () => this.stop());
         this.resetBtn.addEventListener('click', () => this.reset());
         this.deleteBtn.addEventListener('click', () => this.destroy());
-        this.titleInput.addEventListener('change', (e) => {
+        this.deleteBtn.addEventListener('click', () => this.destroy());
+
+        const saveTitle = (e) => {
             this.title = e.target.value;
             triggerSave();
-        });
+        };
+        this.titleInput.addEventListener('change', saveTitle);
+        this.titleInput.addEventListener('input', saveTitle);
     }
 
     async destroy() {
@@ -282,6 +286,8 @@ class Timer extends TimeKeeper {
             } else {
                 this.updateDisplay(this.isRunning ? (this.targetTime - Date.now()) : this.remainingTime);
             }
+            // Ensure buttons reflect state immediately
+            if (this.isRunning) this.toggleButtons();
         }
     }
 
